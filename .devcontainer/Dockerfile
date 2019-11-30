@@ -37,8 +37,8 @@ RUN apt-get update \
 # Create base conda environment
 ADD ./base.yml /
 RUN conda env update -f /base.yml && rm -rf /base.yml
-# ADD ./env.yml /
-# RUN conda env update -f /env.yml && rm -rf /env.yml
+ADD ./env.yml /
+RUN conda env update -f /env.yml && rm -rf /env.yml
 
 # Switch back to dialog for any ad-hoc use of apt-get
 ENV DEBIAN_FRONTEND=
