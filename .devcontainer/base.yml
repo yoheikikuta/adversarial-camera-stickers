@@ -1,0 +1,10 @@
+name: base
+dependencies:
+  - black
+  - flake8
+  - mypy
+  - pytest
+  - pytest-cov
+  - pip:
+    - tox
+    - pytest-randomly
