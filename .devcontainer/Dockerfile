@@ -35,8 +35,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Create base conda environment
-ADD ./base.yml /
-RUN conda env update -f /base.yml && rm -rf /base.yml
 ADD ./env.yml /
 RUN conda env update -f /env.yml && rm -rf /env.yml
 
