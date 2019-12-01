@@ -33,6 +33,14 @@ parser.add_argument('--lr_decay_interval',
                     help='Learning rate will be decayed after each this interval.',
                     default=50)
 
+parser.add_argument('--true_label_idx',
+                    help='True label index of given image.',
+                    default=919)  # 919: street_sign
+
+parser.add_argument('--target_label_idx',
+                    help='Target label index for given image.',
+                    default=595)  # 595: harvester
+
 args = parser.parse_args()
 
 
@@ -112,9 +120,8 @@ def predict_top_N(model: AttackModel, transformed_img: torch.Tensor,
         print(f"  class: {idx2label[elem]}, idx: {elem}, logit: {pred[elem]:.4f}")
 
 
-def compute_loss(pred, true_label_idx=919, target_label_idx=595) -> torch.Tensor:
-    # 919: street_sign
-    # 595: harvester
+def compute_loss(pred: torch.Tensor,
+                 true_label_idx: int, target_label_idx: int) -> torch.Tensor:
     assert true_label_idx is not None
     true_label_contrib = F.nll_loss(pred, torch.tensor([true_label_idx]))
     target_label_contrib = F.nll_loss(pred, torch.tensor([target_label_idx]))
@@ -157,7 +164,7 @@ if __name__ == "__main__":
             lr /= 2.0
         model.zero_grad()
         pred = model(transformed_img.unsqueeze(0))
-        loss = compute_loss(pred)
+        loss = compute_loss(pred, args.true_label_idx, args.target_label_idx)
         loss.backward(retain_graph=True)  # type: ignore
 
         print(f"epoch: {epoch + 1}, loss: {loss.data:.4f}")
