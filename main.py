@@ -10,7 +10,6 @@ import torchvision.models as models
 from skimage import io
 from torchvision import transforms
 
-
 parser = argparse.ArgumentParser(description='Digital attack of adv. camera sticker.')
 
 parser.add_argument('--imagenet_class_json',
@@ -37,6 +36,10 @@ parser.add_argument('--true_label_idx',
                     help='True label index of given image.',
                     default=919, type=int)  # 919: street_sign
 
+parser.add_argument('--is_targeted',
+                    help='Whetehr attack is targeted.',
+                    action='store_true')
+
 parser.add_argument('--target_label_idx',
                     help='Target label index for given image.',
                     default=595, type=int)  # 595: harvester
@@ -49,7 +52,7 @@ class ImageDot(nn.Module):
         super(ImageDot, self).__init__()
         self.means = [0.485, 0.456, 0.406]
         self.stds = [0.229, 0.224, 0.225]
-        self.alpha = 0.5
+        self.alpha = 0.9
         self.radius = 25.0
         self.beta = 2.0
         self.center = nn.Parameter(torch.tensor([
@@ -84,11 +87,11 @@ class ImageDot(nn.Module):
         return torch.exp(- d ** beta + 1e-10)
 
     def _create_blended_img(self, base, mask, color):
-        alpha_tile = mask.expand(3, mask.shape[0], mask.shape[1])
+        alpha_tile = self.alpha * mask.expand(3, mask.shape[0], mask.shape[1])
         color_tile = torch.zeros_like(base)
         for c in range(3):
             color_tile[:, c, :, :] = color[c]
-        return (1. - alpha_tile) * base + self.alpha * alpha_tile * color_tile
+        return (1. - alpha_tile) * base + alpha_tile * color_tile
 
 
 class AttackModel(nn.Module):
@@ -120,15 +123,15 @@ def predict_top_N(model: AttackModel, transformed_img: torch.Tensor,
         print(f"  class: {idx2label[elem]}, idx: {elem}, logit: {pred[elem]:.4f}")
 
 
-def compute_loss(pred: torch.Tensor,
-                 true_label_idx: int, target_label_idx: int) -> torch.Tensor:
+def compute_loss(pred: torch.Tensor, true_label_idx: int, target_label_idx: int,
+                 is_targeted: bool) -> torch.Tensor:
     assert true_label_idx is not None
     true_label_contrib = F.nll_loss(pred, torch.tensor([true_label_idx]))
-    target_label_contrib = F.nll_loss(pred, torch.tensor([target_label_idx]))
-    if target_label_idx is None:
-        return torch.mean(- true_label_contrib)  # non-targeted
-    else:
+    if is_targeted:
+        target_label_contrib = F.nll_loss(pred, torch.tensor([target_label_idx]))
         return torch.mean(- true_label_contrib + target_label_contrib)  # targeted
+    else:
+        return torch.mean(- true_label_contrib)  # non-targeted
 
 
 def load_class_json(img_path: str) -> list:
@@ -164,7 +167,8 @@ if __name__ == "__main__":
             lr /= 2.0
         model.zero_grad()
         pred = model(transformed_img.unsqueeze(0))
-        loss = compute_loss(pred, args.true_label_idx, args.target_label_idx)
+        loss = compute_loss(pred, args.true_label_idx, args.target_label_idx,
+                            args.is_targeted)
         loss.backward(retain_graph=True)  # type: ignore
 
         print(f"epoch: {epoch + 1}, loss: {loss.data:.4f}")
