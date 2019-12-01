@@ -20,6 +20,10 @@ parser.add_argument('--target_img',
                     help='Path to image to be attacked.',
                     default="./image/1200px-STOP_sign.jpg")
 
+parser.add_argument('--seed',
+                    help='Seed value.',
+                    default=0, type=int)
+
 parser.add_argument('--lr',
                     help='Initial learning rate.',
                     default=0.008, type=float)
@@ -153,7 +157,7 @@ def load_class_json(img_path: str) -> list:
 
 
 if __name__ == "__main__":
-    torch.manual_seed(0)
+    torch.manual_seed(args.seed)
 
     # Transformation: resize and normalize
     composed = transforms.Compose(
