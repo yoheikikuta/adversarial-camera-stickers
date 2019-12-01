@@ -36,6 +36,10 @@ parser.add_argument('--lr_decay_interval',
                     help='Learning rate will be decayed after each this interval.',
                     default=50, type=int)
 
+parser.add_argument('--lr_decay_rate',
+                    help='Decay rate of learning rate.',
+                    default=0.5, type=float)
+
 parser.add_argument('--true_label_idx',
                     help='True label index of given image.',
                     default=919, type=int)  # 919: street_sign
@@ -180,7 +184,7 @@ if __name__ == "__main__":
     loss_function = nn.NLLLoss()
     for epoch in range(args.epoch):
         if (epoch + 1) % args.lr_decay_interval == 0:
-            lr /= 2.0
+            lr *= args.lr_decay_rate
         model.zero_grad()
         pred = model(transformed_img.unsqueeze(0))
         loss = compute_loss(pred, args.true_label_idx, args.target_label_idx,
