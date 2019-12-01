@@ -23,23 +23,23 @@ parser.add_argument('--target_img',
 
 parser.add_argument('--lr',
                     help='Initial learning rate.',
-                    default=0.008)
+                    default=0.008, type=float)
 
 parser.add_argument('--epoch',
                     help='Number of training epochs.',
-                    default=200)
+                    default=200, type=int)
 
 parser.add_argument('--lr_decay_interval',
                     help='Learning rate will be decayed after each this interval.',
-                    default=50)
+                    default=50, type=int)
 
 parser.add_argument('--true_label_idx',
                     help='True label index of given image.',
-                    default=919)  # 919: street_sign
+                    default=919, type=int)  # 919: street_sign
 
 parser.add_argument('--target_label_idx',
                     help='Target label index for given image.',
-                    default=595)  # 595: harvester
+                    default=595, type=int)  # 595: harvester
 
 args = parser.parse_args()
 
