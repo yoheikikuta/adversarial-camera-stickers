@@ -48,6 +48,11 @@ args = parser.parse_args()
 
 
 class ImageDot(nn.Module):
+    """
+    Class to treat an image with translucent color dots.
+    forward method creates a blended image of base and color dots.
+    Center positions and colors are hard-coded.
+    """
     def __init__(self):
         super(ImageDot, self).__init__()
         self.means = [0.485, 0.456, 0.406]
@@ -95,6 +100,10 @@ class ImageDot(nn.Module):
 
 
 class AttackModel(nn.Module):
+    """
+    Class to create an adversarial example.
+    forward method returns the prediction result of the perturbated image.
+    """
     def __init__(self):
         super(AttackModel, self).__init__()
         self.image_dot = ImageDot()
@@ -112,7 +121,7 @@ class AttackModel(nn.Module):
 
 def predict_top_N(model: AttackModel, transformed_img: torch.Tensor,
                   N: int, idex2label: list, is_attacked=False) -> None:
-    assert len(transformed_img.shape) == 3
+    assert len(transformed_img.shape) == 3  # Assume the input is single [C, H, W].
     if is_attacked:
         pred = model(transformed_img.unsqueeze(0))
     else:
@@ -125,6 +134,8 @@ def predict_top_N(model: AttackModel, transformed_img: torch.Tensor,
 
 def compute_loss(pred: torch.Tensor, true_label_idx: int, target_label_idx: int,
                  is_targeted: bool) -> torch.Tensor:
+    # Targeted: - loss(true_label) + loss(target_label)
+    # Non-targeted: - loss(true_label)
     assert true_label_idx is not None
     true_label_contrib = F.nll_loss(pred, torch.tensor([true_label_idx]))
     if is_targeted:
@@ -144,6 +155,7 @@ def load_class_json(img_path: str) -> list:
 if __name__ == "__main__":
     torch.manual_seed(0)
 
+    # Transformation: resize and normalize
     composed = transforms.Compose(
         [transforms.Resize((256, 256)),
          transforms.ToTensor(),
