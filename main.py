@@ -52,6 +52,10 @@ parser.add_argument('--target_label_idx',
                     help='Target label index for given image.',
                     default=595, type=int)  # 595: harvester
 
+parser.add_argument('--prediction_top_N',
+                    help='Top N prediction result will be shown.',
+                    default=10, type=int)
+
 args = parser.parse_args()
 
 
@@ -177,7 +181,7 @@ if __name__ == "__main__":
     model = AttackModel()
 
     print("Prediction result (before the attack):")
-    predict_top_N(model, transformed_img, 10, idx2label)
+    predict_top_N(model, transformed_img, args.prediction_top_N, idx2label)
 
     # Train model
     lr = args.lr
@@ -200,4 +204,4 @@ if __name__ == "__main__":
                     min=0.0, max=1.0)
 
     print("Prediction result (after the attack):")
-    predict_top_N(model, transformed_img, 10, idx2label, True)
+    predict_top_N(model, transformed_img, args.prediction_top_N, idx2label, True)
