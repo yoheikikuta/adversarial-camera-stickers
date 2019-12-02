@@ -1,6 +1,10 @@
 # Adversarail camera stickers
 A very limted implementation of [Adversarial camera stickers: A physical camera-based attack on deep learning systems](https://arxiv.org/abs/1904.00759).
 
+## Acknowledgement
+I would like to express my special thanks of gratitude to Juncheng B. Li (the first author of the original paper) for answering technical questions and giving a direction of implementation.
+
+## Result
 <p align="center">
   <img width="300" height="300" src="/image/1200px-STOP_sign.jpg">
 </p>
