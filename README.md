@@ -27,7 +27,7 @@ class: street_sign, idx: 919, logit: 13.6607
   <img width="300" height="300" src="https://i.imgur.com/Y3V1UsE.png">
 </p>
 
-After the attack:
+After the targeted attack (target label idx is `595`):
 ```
 class: radio_telescope, idx: 755, logit: 7.8390
 class: lumbermill, idx: 634, logit: 7.9665
@@ -55,11 +55,11 @@ This repository provides:
 
 
 ## Environment
-Even though VSCode Remove Develepment environment is assumed, the script essentially depends on `PyTorch`, `torchvision`, `NumPy` and `skimage`.
+Even though VSCode Remove Develepment environment is assumed, the script essentially just depends on `PyTorch`, `torchvision`, `NumPy` and `skimage`.
 
 
 ## Running script
-This repository includes an image which will be attacked [here](https://github.com/yoheikikuta/adversarial-camera-stickers/tree/master/image); it's a street_sign image (ImageNet-1000 class label idx is `919`).
+This repository includes an image which will be attacked [here](https://github.com/yoheikikuta/adversarial-camera-stickers/tree/master/image); it's a street_sign image (corresponding ImageNet-1000 class label idx is `919`).
 
 - Targeted attack  
   You can choose a target label which follows ImageNet-1000 class labels (default: `595` (harvester)).
